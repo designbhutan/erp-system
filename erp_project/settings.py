@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'accounts',
     'leave',
     'materials',
+    'vehicles',
 ]
 
 MIDDLEWARE = [

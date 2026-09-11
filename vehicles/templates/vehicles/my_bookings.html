@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}My Bookings{% endblock %}
+{% block page_title %}My Vehicle Bookings{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>My Vehicle Bookings</h1>
+    <p>Your submitted vehicle booking requests.</p>
+</div>
+
+<div style="margin-bottom:20px;display:flex;gap:10px;">
+    <a href="{% url 'vehicles_book' %}" class="btn btn-primary">+ New Booking</a>
+    <a href="{% url 'vehicles_list' %}" class="btn btn-secondary">Fleet</a>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr><th>ID</th><th>Vehicle</th><th>Project</th><th>From</th><th>To</th><th>Duration</th><th>Status</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+        {% for b in bookings %}
+        <tr>
+            <td><strong>VB#{{ b.pk }}</strong></td>
+            <td>{{ b.vehicle.plate_number }}<br><span style="color:#94a3b8;font-size:12px;">{{ b.vehicle.get_vehicle_type_display }}</span></td>
+            <td>{% if b.project %}{{ b.project.code }}{% else %}{{ b.project_name|default:"—" }}{% endif %}</td>
+            <td>{{ b.start_datetime|date:"d M Y, H:i" }}</td>
+            <td>{{ b.end_datetime|date:"d M Y, H:i" }}</td>
+            <td>{{ b.duration_hours }}h</td>
+            <td>
+                {% if b.status == 'pending' %}<span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Pending</span>
+                {% elif b.status == 'approved' %}<span style="background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Approved</span>
+                {% elif b.status == 'rejected' %}<span style="background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Rejected</span>
+                {% elif b.status == 'completed' %}<span style="background:#dbeafe;color:#1e40af;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Completed</span>
+                {% else %}<span style="background:#e2e8f0;color:#475569;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Cancelled</span>{% endif %}
+            </td>
+            <td>
+                {% if b.status == 'pending' or b.status == 'approved' %}
+                <a href="{% url 'vehicles_cancel' b.pk %}" class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="return confirm('Cancel this booking?');">Cancel</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:30px;">No bookings yet</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

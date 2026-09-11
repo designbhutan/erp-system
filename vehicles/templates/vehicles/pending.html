@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Pending Vehicle Bookings{% endblock %}
+{% block page_title %}Pending Vehicle Bookings{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Pending Vehicle Bookings</h1>
+    <p>{{ pending|length }} booking{{ pending|length|pluralize }} awaiting review.</p>
+</div>
+
+{% for b in pending %}
+<div style="background:white;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div>
+            <strong style="font-size:15px;">VB#{{ b.pk }}</strong>
+            <span style="color:#64748b;margin-left:10px;">by <strong>{{ b.user.first_name|default:b.user.username }}</strong></span>
+            <span style="color:#64748b;margin-left:10px;">· {{ b.vehicle.plate_number }} ({{ b.vehicle.get_vehicle_type_display }})</span>
+        </div>
+        <span style="color:#94a3b8;font-size:12px;">{{ b.created_at|date:"d M Y, H:i" }}</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div style="padding:10px 14px;background:#f8fafc;border-radius:8px;">
+            <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:600;">From</div>
+            <div style="font-size:14px;font-weight:600;">{{ b.start_datetime|date:"d M Y, H:i" }}</div>
+        </div>
+        <div style="padding:10px 14px;background:#f8fafc;border-radius:8px;">
+            <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:600;">To</div>
+            <div style="font-size:14px;font-weight:600;">{{ b.end_datetime|date:"d M Y, H:i" }}</div>
+        </div>
+    </div>
+
+    <div style="margin-bottom:12px;font-size:14px;">
+        <strong>Project:</strong> {% if b.project %}{{ b.project.code }} — {{ b.project.name }}{% else %}{{ b.project_name|default:"—" }}{% endif %}<br>
+        {% if b.destination %}<strong>Destination:</strong> {{ b.destination }}<br>{% endif %}
+        {% if b.purpose %}<strong>Purpose:</strong> {{ b.purpose }}{% endif %}
+    </div>
+
+    <div style="display:flex;gap:10px;">
+        <a href="{% url 'vehicles_review' b.pk 'approve' %}" class="btn btn-success" onclick="return confirm('Approve this booking?');">Approve</a>
+        <a href="{% url 'vehicles_review' b.pk 'reject' %}" class="btn btn-danger" onclick="return confirm('Reject this booking?');">Reject</a>
+    </div>
+</div>
+{% empty %}
+<div style="background:white;padding:40px;border-radius:12px;text-align:center;color:#94a3b8;">
+    No pending bookings 🎉
+</div>
+{% endfor %}
+{% endblock %}

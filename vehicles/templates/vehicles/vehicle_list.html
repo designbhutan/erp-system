@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Fleet{% endblock %}
+{% block page_title %}Fleet Vehicles{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Fleet Vehicles</h1>
+    <p>{{ vehicles|length }} vehicle{{ vehicles|length|pluralize }} in fleet</p>
+</div>
+
+<div style="margin-bottom:20px;display:flex;gap:10px;">
+    <a href="{% url 'vehicles_book' %}" class="btn btn-primary">+ Book a Vehicle</a>
+    <a href="{% url 'vehicles_my_bookings' %}" class="btn btn-secondary">My Bookings</a>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr><th>Plate</th><th>Type</th><th>Make / Model</th><th>Status</th><th>Location</th></tr>
+    </thead>
+    <tbody>
+        {% for v in vehicles %}
+        <tr>
+            <td><strong>{{ v.plate_number }}</strong></td>
+            <td>{{ v.get_vehicle_type_display }}</td>
+            <td>{{ v.make_model|default:"—" }}</td>
+            <td>
+                {% if v.status == 'available' %}<span style="background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Available</span>
+                {% elif v.status == 'in_use' %}<span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">In Use</span>
+                {% elif v.status == 'maintenance' %}<span style="background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Maintenance</span>
+                {% else %}<span style="background:#e2e8f0;color:#475569;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Retired</span>{% endif %}
+            </td>
+            <td style="color:#64748b;">{{ v.current_location|default:"—" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:30px;">No vehicles in fleet. Add some via Django Admin.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
