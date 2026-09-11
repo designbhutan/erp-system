@@ -1,0 +1,1 @@
+# No models in this app — it's a dashboard aggregator only.

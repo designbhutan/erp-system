@@ -114,6 +114,7 @@
         {% if user.profile.is_admin %}
         <div class="sidebar-section">Administration</div>
         <ul class="sidebar-menu">
+            <li><a href="{% url 'approval_center' %}" class="{% if request.resolver_match.url_name == 'approval_center' %}active{% endif %}"><span class="icon">📥</span> Approval Center</a></li>
             <li><a href="{% url 'leave_pending' %}" class="{% if request.resolver_match.url_name == 'leave_pending' %}active{% endif %}"><span class="icon">✅</span> Approve Leave</a></li>
             <li><a href="{% url 'materials_pending' %}" class="{% if request.resolver_match.url_name == 'materials_pending' %}active{% endif %}"><span class="icon">✅</span> Approve Materials</a></li>
             <li><a href="{% url 'vehicles_pending' %}" class="{% if request.resolver_match.url_name == 'vehicles_pending' %}active{% endif %}"><span class="icon">✅</span> Approve Bookings</a></li>

@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}Approval Center{% endblock %}
+{% block page_title %}Approval Center{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Approval Center</h1>
+    <p>{{ total_count }} pending item{{ total_count|pluralize }} across all categories.</p>
+</div>
+
+<!-- Summary cards -->
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:30px;">
+    <div class="card orange">
+        <h2>{{ leave_count }}</h2>
+        <p>Pending Leave Requests</p>
+    </div>
+    <div class="card purple">
+        <h2>{{ materials_count }}</h2>
+        <p>Pending Material Requests</p>
+    </div>
+    <div class="card">
+        <h2>{{ bookings_count }}</h2>
+        <p>Pending Vehicle Bookings</p>
+    </div>
+</div>
+
+<!-- LEAVES -->
+<div style="margin-bottom:36px;">
+    <h3 style="font-size:17px;color:#334155;margin-bottom:14px;font-weight:700;">🌴 Leave Requests ({{ leave_count }})</h3>
+    {% if pending_leaves %}
+    <table class="data-table">
+        <thead>
+            <tr><th>Employee</th><th>From</th><th>To</th><th>Days</th><th>Reason</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            {% for r in pending_leaves %}
+            <tr>
+                <td><strong>{{ r.user.first_name|default:r.user.username }}</strong></td>
+                <td>{{ r.start_date|date:"d M Y" }}</td>
+                <td>{{ r.end_date|date:"d M Y" }}</td>
+                <td>{{ r.days_requested }}</td>
+                <td style="max-width:280px;color:#64748b;">{{ r.reason|truncatechars:60 }}</td>
+                <td>
+                    <a href="{% url 'leave_review' r.pk 'approve' %}" class="btn btn-success" style="padding:6px 12px;font-size:12px;" onclick="return confirm('Approve this leave?');">Approve</a>
+                    <a href="{% url 'leave_review' r.pk 'reject' %}" class="btn btn-danger" style="padding:6px 12px;font-size:12px;" onclick="return confirm('Reject this leave?');">Reject</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="background:white;padding:20px;border-radius:10px;color:#94a3b8;text-align:center;font-size:14px;">No pending leave requests</div>
+    {% endif %}
+</div>
+
+<!-- MATERIALS -->
+<div style="margin-bottom:36px;">
+    <h3 style="font-size:17px;color:#334155;margin-bottom:14px;font-weight:700;">📦 Material Requests ({{ materials_count }})</h3>
+    {% if pending_materials %}
+    {% for r in pending_materials %}
+    <div style="background:white;padding:18px;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div>
+                <strong>MR#{{ r.pk }}</strong>
+                <span style="color:#64748b;margin-left:10px;">by {{ r.user.first_name|default:r.user.username }}</span>
+                {% if r.project_name %}<span style="color:#64748b;margin-left:10px;">· {{ r.project_name }}</span>{% endif %}
+            </div>
+            <span style="color:#94a3b8;font-size:12px;">{{ r.created_at|date:"d M Y, H:i" }}</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:12px;">
+            <thead>
+                <tr style="border-bottom:1px solid #f1f5f9;">
+                    <th style="text-align:left;padding:6px 0;font-size:11px;color:#94a3b8;text-transform:uppercase;">Material</th>
+                    <th style="text-align:left;padding:6px 0;font-size:11px;color:#94a3b8;text-transform:uppercase;">Requested</th>
+                    <th style="text-align:left;padding:6px 0;font-size:11px;color:#94a3b8;text-transform:uppercase;">Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for line in r.lines.all %}
+                <tr>
+                    <td style="padding:6px 0;font-size:13px;">{{ line.material.name }} <span style="color:#94a3b8;">({{ line.material.code }})</span></td>
+                    <td style="padding:6px 0;font-size:13px;">{{ line.quantity }} {{ line.material.unit }}</td>
+                    <td style="padding:6px 0;font-size:13px;">
+                        {% if line.material.stock_quantity < line.quantity %}
+                        <span style="color:#dc2626;font-weight:700;">{{ line.material.stock_quantity }} ⚠</span>
+                        {% else %}{{ line.material.stock_quantity }}{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="display:flex;gap:8px;">
+            <a href="{% url 'materials_review' r.pk 'approve' %}" class="btn btn-success" style="padding:6px 12px;font-size:12px;" onclick="return confirm('Approve? Stock will be deducted.');">Approve</a>
+            <a href="{% url 'materials_review' r.pk 'reject' %}" class="btn btn-danger" style="padding:6px 12px;font-size:12px;" onclick="return confirm('Reject?');">Reject</a>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div style="background:white;padding:20px;border-radius:10px;color:#94a3b8;text-align:center;font-size:14px;">No pending material requests</div>
+    {% endif %}
+</div>
+
+<!-- VEHICLE BOOKINGS -->
+<div style="margin-bottom:36px;">
+    <h3 style="font-size:17px;color:#334155;margin-bottom:14px;font-weight:700;">🚗 Vehicle Bookings ({{ bookings_count }})</h3>
+    {% if pending_bookings %}
+    <table class="data-table">
+        <thead>
+            <tr><th>Employee</th><th>Vehicle</th><th>From</th><th>To</th><th>Destination</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            {% for b in pending_bookings %}
+            <tr>
+                <td><strong>{{ b.user.first_name|default:b.user.username }}</strong></td>
+                <td>{{ b.vehicle.plate_number }}</td>
+                <td>{{ b.start_datetime|date:"d M Y, H:i" }}</td>
+                <td>{{ b.end_datetime|date:"d M Y, H:i" }}</td>
+                <td style="color:#64748b;">{{ b.destination|default:"—" }}</td>
+                <td>
+                    <a href="{% url 'vehicles_review' b.pk 'approve' %}" class="btn btn-success" style="padding:6px 12px;font-size:12px;" onclick="return confirm('Approve this booking?');">Approve</a>
+                    <a href="{% url 'vehicles_review' b.pk 'reject' %}" class="btn btn-danger" style="padding:6px 12px;font-size:12px;" onclick="return confirm('Reject?');">Reject</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="background:white;padding:20px;border-radius:10px;color:#94a3b8;text-align:center;font-size:14px;">No pending vehicle bookings</div>
+    {% endif %}
+</div>
+{% endblock %}

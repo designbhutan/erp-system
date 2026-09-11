@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'leave',
     'materials',
     'vehicles',
+    'approvals',
 ]
 
 MIDDLEWARE = [
