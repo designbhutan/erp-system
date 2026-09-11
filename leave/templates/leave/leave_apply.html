@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Apply for Leave{% endblock %}
+{% block page_title %}Apply for Leave{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Apply for Leave</h1>
+    <p>You have <strong>{{ stats.remaining }}</strong> days remaining this leave year.</p>
+</div>
+
+<div style="max-width:600px;">
+    <form method="post" style="background:white;padding:30px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<small class="error-text">{{ field.errors.0 }}</small>{% endif %}
+        </div>
+        {% endfor %}
+        <div style="margin-top:20px;display:flex;gap:10px;">
+            <button type="submit" class="btn btn-primary">Submit Request</button>
+            <a href="{% url 'leave_home' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

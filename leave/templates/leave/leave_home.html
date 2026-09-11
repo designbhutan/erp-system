@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}My Leave{% endblock %}
+{% block page_title %}Leave Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>My Leave</h1>
+    <p>Leave year: {{ stats.year_start|date:"d M Y" }} → {{ stats.year_end|date:"d M Y" }}</p>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:24px;">
+    <div class="card"><h2>{{ stats.entitlement }}</h2><p>Days Entitled</p></div>
+    <div class="card orange"><h2>{{ stats.used }}</h2><p>Days Used</p></div>
+    <div class="card purple"><h2>{{ stats.pending }}</h2><p>Days Pending</p></div>
+    <div class="card green"><h2>{{ stats.remaining }}</h2><p>Days Remaining</p></div>
+</div>
+
+<div style="margin-bottom:20px;">
+    <a href="{% url 'leave_apply' %}" class="btn btn-primary">+ Apply for Leave</a>
+</div>
+
+<h3 style="font-size:16px;color:#334155;margin-bottom:12px;font-weight:600;">My Leave History</h3>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>From</th><th>To</th><th>Days</th><th>Reason</th><th>Status</th><th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in my_requests %}
+        <tr>
+            <td>{{ r.start_date|date:"d M Y" }}</td>
+            <td>{{ r.end_date|date:"d M Y" }}</td>
+            <td>{{ r.days_requested }}</td>
+            <td style="max-width:260px;color:#64748b;">{{ r.reason|truncatechars:60 }}</td>
+            <td>
+                {% if r.status == 'pending' %}<span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Pending</span>
+                {% elif r.status == 'approved' %}<span style="background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Approved</span>
+                {% elif r.status == 'rejected' %}<span style="background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Rejected</span>
+                {% else %}<span style="background:#e2e8f0;color:#475569;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Cancelled</span>{% endif %}
+            </td>
+            <td>
+                {% if r.status == 'pending' %}
+                <a href="{% url 'leave_cancel' r.pk %}" class="btn btn-secondary" style="padding:6px 12px;font-size:12px;">Cancel</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:30px;">No leave requests yet</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

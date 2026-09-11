@@ -92,20 +92,23 @@
             <span class="logo-icon">🏢</span>
             <span>ERP System</span>
         </div>
+
         <div class="sidebar-section">Main</div>
         <ul class="sidebar-menu">
-            <li><a href="{% url 'dashboard' %}"><span class="icon">📊</span> Dashboard</a></li>
+            <li><a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><span class="icon">📊</span> Dashboard</a></li>
         </ul>
+
         <div class="sidebar-section">My Requests</div>
         <ul class="sidebar-menu">
-            <li><a href="#"><span class="icon">🌴</span> Leave</a></li>
+            <li><a href="{% url 'leave_home' %}" class="{% if 'leave' in request.resolver_match.url_name %}active{% endif %}"><span class="icon">🌴</span> Leave</a></li>
             <li><a href="#"><span class="icon">🚗</span> Vehicle Booking</a></li>
             <li><a href="#"><span class="icon">📦</span> Material Request</a></li>
         </ul>
+
         {% if user.profile.is_admin %}
         <div class="sidebar-section">Administration</div>
         <ul class="sidebar-menu">
-            <li><a href="#"><span class="icon">✅</span> Approvals</a></li>
+            <li><a href="{% url 'leave_pending' %}" class="{% if request.resolver_match.url_name == 'leave_pending' %}active{% endif %}"><span class="icon">✅</span> Approve Leave</a></li>
             <li><a href="#"><span class="icon">👥</span> Employees</a></li>
             <li><a href="#"><span class="icon">🚙</span> Fleet</a></li>
             <li><a href="#"><span class="icon">📦</span> Inventory</a></li>
@@ -114,12 +117,14 @@
             <li><a href="/admin/" target="_blank"><span class="icon">⚙️</span> Django Admin</a></li>
         </ul>
         {% endif %}
+
         <div class="sidebar-section">Account</div>
         <ul class="sidebar-menu">
             <li><a href="#"><span class="icon">👤</span> My Profile</a></li>
             <li><a href="{% url 'logout' %}"><span class="icon">🚪</span> Logout</a></li>
         </ul>
     </aside>
+
     <div class="main">
         <header class="topbar">
             <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
@@ -134,6 +139,7 @@
                 </div>
             </div>
         </header>
+
         {% if messages %}
         <div class="messages">
             {% for message in messages %}
@@ -141,11 +147,13 @@
             {% endfor %}
         </div>
         {% endif %}
+
         <main class="content">
             {% block content %}{% endblock %}
         </main>
     </div>
 </div>
+
 {% else %}
     {% if messages %}
     <div class="messages" style="max-width:420px;margin:20px auto;">

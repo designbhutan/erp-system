@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Pending Leave Approvals{% endblock %}
+{% block page_title %}Pending Leave Approvals{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Pending Leave Requests</h1>
+    <p>{{ pending|length }} request{{ pending|length|pluralize }} awaiting review.</p>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr><th>Employee</th><th>From</th><th>To</th><th>Days</th><th>Reason</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+        {% for r in pending %}
+        <tr>
+            <td><strong>{{ r.user.first_name|default:r.user.username }}</strong></td>
+            <td>{{ r.start_date|date:"d M Y" }}</td>
+            <td>{{ r.end_date|date:"d M Y" }}</td>
+            <td>{{ r.days_requested }}</td>
+            <td style="max-width:300px;color:#64748b;">{{ r.reason|truncatechars:80 }}</td>
+            <td>
+                <a href="{% url 'leave_review' r.pk 'approve' %}" class="btn btn-success" style="padding:6px 14px;font-size:12px;" onclick="return confirm('Approve this leave?');">Approve</a>
+                <a href="{% url 'leave_review' r.pk 'reject' %}" class="btn btn-danger" style="padding:6px 14px;font-size:12px;" onclick="return confirm('Reject this leave?');">Reject</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:30px;">No pending requests 🎉</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
