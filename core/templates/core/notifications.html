@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}Notifications{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Notifications</h1>
+    <p>{% if user.profile.is_admin %}Pending items awaiting your approval.{% else %}Your recent request activity.{% endif %}</p>
+</div>
+
+{% if user.profile.is_admin %}
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:30px;">
+    <div class="card orange"><h2>{{ leave_count }}</h2><p>Pending Leaves</p></div>
+    <div class="card purple"><h2>{{ materials_count }}</h2><p>Pending Materials</p></div>
+    <div class="card"><h2>{{ bookings_count }}</h2><p>Pending Bookings</p></div>
+    <div class="card green"><h2>{{ pos_count }}</h2><p>Submitted POs</p></div>
+</div>
+
+{% if pending_leaves %}
+<h3 style="font-size:15px;color:#334155;margin-bottom:12px;font-weight:600;">🌴 Pending Leave</h3>
+<table class="data-table" style="margin-bottom:24px;">
+    <thead><tr><th>Employee</th><th>From</th><th>To</th><th>Days</th><th>Action</th></tr></thead>
+    <tbody>
+        {% for r in pending_leaves %}
+        <tr>
+            <td>{{ r.user.first_name|default:r.user.username }}</td>
+            <td>{{ r.start_date|date:"d M Y" }}</td>
+            <td>{{ r.end_date|date:"d M Y" }}</td>
+            <td>{{ r.days_requested }}</td>
+            <td><a href="{% url 'leave_review' r.pk 'approve' %}" class="btn btn-success" style="padding:6px 12px;font-size:12px;">Approve</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if pending_materials %}
+<h3 style="font-size:15px;color:#334155;margin-bottom:12px;font-weight:600;">📦 Pending Materials</h3>
+<table class="data-table" style="margin-bottom:24px;">
+    <thead><tr><th>ID</th><th>Employee</th><th>Project</th><th>Items</th><th>Action</th></tr></thead>
+    <tbody>
+        {% for r in pending_materials %}
+        <tr>
+            <td>MR#{{ r.pk }}</td>
+            <td>{{ r.user.first_name|default:r.user.username }}</td>
+            <td>{{ r.project_name|default:"—" }}</td>
+            <td>{{ r.total_items }}</td>
+            <td><a href="{% url 'materials_review' r.pk 'approve' %}" class="btn btn-success" style="padding:6px 12px;font-size:12px;">Approve</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if pending_bookings %}
+<h3 style="font-size:15px;color:#334155;margin-bottom:12px;font-weight:600;">🚗 Pending Bookings</h3>
+<table class="data-table" style="margin-bottom:24px;">
+    <thead><tr><th>ID</th><th>Employee</th><th>Vehicle</th><th>From</th><th>Action</th></tr></thead>
+    <tbody>
+        {% for b in pending_bookings %}
+        <tr>
+            <td>VB#{{ b.pk }}</td>
+            <td>{{ b.user.first_name|default:b.user.username }}</td>
+            <td>{{ b.vehicle.plate_number }}</td>
+            <td>{{ b.start_datetime|date:"d M Y, H:i" }}</td>
+            <td><a href="{% url 'vehicles_review' b.pk 'approve' %}" class="btn btn-success" style="padding:6px 12px;font-size:12px;">Approve</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if not pending_leaves and not pending_materials and not pending_bookings and not pending_pos %}
+<div style="background:white;padding:40px;border-radius:12px;text-align:center;color:#94a3b8;">No pending items 🎉</div>
+{% endif %}
+
+{% else %}
+
+<h3 style="font-size:15px;color:#334155;margin-bottom:12px;font-weight:600;">🌴 My Recent Leave</h3>
+<table class="data-table" style="margin-bottom:24px;">
+    <thead><tr><th>From</th><th>Days</th><th>Status</th></tr></thead>
+    <tbody>
+        {% for r in my_leaves %}
+        <tr><td>{{ r.start_date|date:"d M Y" }}</td><td>{{ r.days_requested }}</td><td>{{ r.get_status_display }}</td></tr>
+        {% empty %}<tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:20px;">None</td></tr>{% endfor %}
+    </tbody>
+</table>
+
+<h3 style="font-size:15px;color:#334155;margin-bottom:12px;font-weight:600;">📦 My Recent Material Requests</h3>
+<table class="data-table" style="margin-bottom:24px;">
+    <thead><tr><th>ID</th><th>Items</th><th>Status</th></tr></thead>
+    <tbody>
+        {% for r in my_materials %}
+        <tr><td>MR#{{ r.pk }}</td><td>{{ r.total_items }}</td><td>{{ r.get_status_display }}</td></tr>
+        {% empty %}<tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:20px;">None</td></tr>{% endfor %}
+    </tbody>
+</table>
+
+<h3 style="font-size:15px;color:#334155;margin-bottom:12px;font-weight:600;">🚗 My Recent Bookings</h3>
+<table class="data-table">
+    <thead><tr><th>ID</th><th>Vehicle</th><th>Status</th></tr></thead>
+    <tbody>
+        {% for b in my_bookings %}
+        <tr><td>VB#{{ b.pk }}</td><td>{{ b.vehicle.plate_number }}</td><td>{{ b.get_status_display }}</td></tr>
+        {% empty %}<tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:20px;">None</td></tr>{% endfor %}
+    </tbody>
+</table>
+
+{% endif %}
+{% endblock %}

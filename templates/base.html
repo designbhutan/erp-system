@@ -22,8 +22,14 @@
         .sidebar-menu .icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
         .sidebar-menu .badge { margin-left: auto; background: #ef4444; color: white; font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 700; }
         .main { flex: 1; margin-left: 250px; min-height: 100vh; display: flex; flex-direction: column; }
-        .topbar { background: white; height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 50; }
+        .topbar { background: white; height: 64px; display: flex; align-items: center; gap: 20px; padding: 0 30px; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 50; }
         .topbar-title { font-size: 18px; font-weight: 600; color: #1e293b; }
+        .topbar-search { flex: 1; max-width: 400px; margin-left: auto; position: relative; }
+        .topbar-search input { width: 100%; padding: 9px 14px 9px 38px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .topbar-search input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+        .topbar-search::before { content: "🔍"; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; opacity: 0.6; }
+        .topbar-bell { position: relative; font-size: 20px; padding: 6px; cursor: pointer; }
+        .topbar-bell .bell-badge { position: absolute; top: 0; right: 0; background: #ef4444; color: white; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; min-width: 18px; text-align: center; }
         .topbar-user { display: flex; align-items: center; gap: 14px; }
         .user-info { text-align: right; line-height: 1.2; }
         .user-name { font-size: 14px; font-weight: 600; color: #1e293b; }
@@ -37,6 +43,7 @@
             .sidebar.open { transform: translateX(0); }
             .main { margin-left: 0; }
             .menu-toggle { display: block; }
+            .topbar-search { display: none; }
         }
         .messages { padding: 0 30px; margin-top: 16px; }
         .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 10px; font-size: 14px; }
@@ -96,6 +103,10 @@
         <div class="sidebar-section">Main</div>
         <ul class="sidebar-menu">
             <li><a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><span class="icon">📊</span> Dashboard</a></li>
+            <li><a href="{% url 'notifications' %}" class="{% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
+                <span class="icon">🔔</span> Notifications
+                {% if pending_count %}<span class="badge">{{ pending_count }}</span>{% endif %}
+            </a></li>
             <li><a href="{% url 'reports_company' %}" class="{% if request.resolver_match.url_name == 'reports_company' %}active{% endif %}"><span class="icon">📊</span> Company Reports</a></li>
             <li><a href="{% url 'reports_my' %}" class="{% if request.resolver_match.url_name == 'reports_my' %}active{% endif %}"><span class="icon">📈</span> My Reports</a></li>
         </ul>
@@ -138,6 +149,16 @@
         <header class="topbar">
             <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
             <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+
+            <form class="topbar-search" method="get" action="{% url 'search' %}">
+                <input type="text" name="q" placeholder="Search projects, materials, vehicles..." value="{{ request.GET.q|default:'' }}">
+            </form>
+
+            <a href="{% url 'notifications' %}" class="topbar-bell" title="Notifications">
+                🔔
+                {% if pending_count %}<span class="bell-badge">{{ pending_count }}</span>{% endif %}
+            </a>
+
             <div class="topbar-user">
                 <div class="user-info">
                     <div class="user-name">{{ user.first_name|default:user.username }} {{ user.last_name }}</div>

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from django.db.models import Q
 from .models import (
     Department, Employee, Vehicle, VehicleBooking,
     Project, Material, Supplier
@@ -31,8 +32,16 @@ def dashboard(request):
 
 @login_required
 def project_list(request):
-    projects = Project.objects.select_related('manager').all()
-    return render(request, 'core/project_list.html', {'projects': projects})
+    status = request.GET.get('status', '')
+    qs = Project.objects.select_related('manager').all()
+    if status:
+        qs = qs.filter(status=status)
+    context = {
+        'projects': qs,
+        'statuses': Project.STATUS_CHOICES,
+        'current_status': status,
+    }
+    return render(request, 'core/project_list.html', context)
 
 
 @login_required
@@ -105,3 +114,98 @@ def project_delete(request, pk):
         messages.success(request, "Project deleted.")
         return redirect('project_list')
     return render(request, 'core/project_confirm_delete.html', {'project': project})
+
+
+# ========== NOTIFICATIONS ==========
+
+@login_required
+def notifications(request):
+    from leave.models import LeaveRequest
+    from materials.models import MaterialRequest
+    from vehicles.models import VehicleBooking
+    from procurement.models import PurchaseOrder
+
+    context = {}
+
+    if is_admin(request.user):
+        context['pending_leaves'] = LeaveRequest.objects.filter(status='pending').select_related('user')[:20]
+        context['pending_materials'] = MaterialRequest.objects.filter(status='pending').select_related('user')[:20]
+        context['pending_bookings'] = VehicleBooking.objects.filter(status='pending').select_related('user', 'vehicle')[:20]
+        context['pending_pos'] = PurchaseOrder.objects.filter(status='submitted')[:20]
+        context['leave_count'] = LeaveRequest.objects.filter(status='pending').count()
+        context['materials_count'] = MaterialRequest.objects.filter(status='pending').count()
+        context['bookings_count'] = VehicleBooking.objects.filter(status='pending').count()
+        context['pos_count'] = PurchaseOrder.objects.filter(status='submitted').count()
+        context['total_count'] = (
+            context['leave_count'] + context['materials_count'] +
+            context['bookings_count'] + context['pos_count']
+        )
+    else:
+        context['my_leaves'] = LeaveRequest.objects.filter(user=request.user).order_by('-created_at')[:10]
+        context['my_materials'] = MaterialRequest.objects.filter(user=request.user).order_by('-created_at')[:10]
+        context['my_bookings'] = VehicleBooking.objects.filter(user=request.user).order_by('-created_at')[:10]
+
+    return render(request, 'core/notifications.html', context)
+
+
+@login_required
+def notification_count(request):
+    """Returns count for badge — used as context processor helper."""
+    from leave.models import LeaveRequest
+    from materials.models import MaterialRequest
+    from vehicles.models import VehicleBooking
+    from procurement.models import PurchaseOrder
+
+    if is_admin(request.user):
+        count = (
+            LeaveRequest.objects.filter(status='pending').count() +
+            MaterialRequest.objects.filter(status='pending').count() +
+            VehicleBooking.objects.filter(status='pending').count() +
+            PurchaseOrder.objects.filter(status='submitted').count()
+        )
+    else:
+        count = (
+            LeaveRequest.objects.filter(user=request.user, status='pending').count() +
+            MaterialRequest.objects.filter(user=request.user, status='pending').count() +
+            VehicleBooking.objects.filter(user=request.user, status='pending').count()
+        )
+    return count
+
+
+# ========== SEARCH ==========
+
+@login_required
+def search(request):
+    q = request.GET.get('q', '').strip()
+    context = {'q': q, 'results_count': 0}
+
+    if q and len(q) >= 2:
+        projects = Project.objects.filter(
+            Q(name__icontains=q) | Q(code__icontains=q)
+        )[:20]
+        materials = Material.objects.filter(
+            Q(name__icontains=q) | Q(code__icontains=q)
+        )[:20]
+        vehicles = Vehicle.objects.filter(
+            Q(plate_number__icontains=q) | Q(make_model__icontains=q)
+        )[:20]
+        employees = Employee.objects.filter(
+            Q(full_name__icontains=q) | Q(employee_id__icontains=q) | Q(position__icontains=q)
+        )[:20]
+        suppliers = Supplier.objects.filter(
+            Q(name__icontains=q) | Q(contact_person__icontains=q)
+        )[:20]
+
+        context.update({
+            'projects': projects,
+            'materials': materials,
+            'vehicles': vehicles,
+            'employees': employees,
+            'suppliers': suppliers,
+            'results_count': (
+                projects.count() + materials.count() + vehicles.count() +
+                employees.count() + suppliers.count()
+            ),
+        })
+
+    return render(request, 'core/search.html', context)

@@ -5,14 +5,19 @@
 {% block content %}
 <div class="page-header">
     <h1>Projects</h1>
-    <p>{{ projects|length }} project{{ projects|length|pluralize }} in the system.</p>
+    <p>{{ projects|length }} project{{ projects|length|pluralize }} shown.</p>
 </div>
 
-{% if user.profile.is_admin %}
-<div style="margin-bottom:20px;">
-    <a href="{% url 'project_create' %}" class="btn btn-primary">+ New Project</a>
+<div style="margin-bottom:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+    {% if user.profile.is_admin %}<a href="{% url 'project_create' %}" class="btn btn-primary">+ New Project</a>{% endif %}
+    <form method="get" style="display:inline-flex;gap:8px;align-items:center;margin-left:auto;">
+        <label style="font-size:13px;color:#64748b;font-weight:600;">Filter:</label>
+        <select name="status" class="form-control" style="width:auto;" onchange="this.form.submit()">
+            <option value="">All statuses</option>
+            {% for v, l in statuses %}<option value="{{ v }}" {% if current_status == v %}selected{% endif %}>{{ l }}</option>{% endfor %}
+        </select>
+    </form>
 </div>
-{% endif %}
 
 <table class="data-table">
     <thead>
@@ -35,13 +40,7 @@
                     <span style="font-size:12px;color:#64748b;">{{ p.progress_percent }}%</span>
                 </div>
             </td>
-            <td>
-                {% if p.status == 'planning' %}<span style="background:#e2e8f0;color:#475569;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Planning</span>
-                {% elif p.status == 'active' %}<span style="background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Active</span>
-                {% elif p.status == 'on_hold' %}<span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">On Hold</span>
-                {% elif p.status == 'completed' %}<span style="background:#dbeafe;color:#1e40af;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Completed</span>
-                {% else %}<span style="background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Cancelled</span>{% endif %}
-            </td>
+            <td>{{ p.get_status_display }}</td>
             <td>
                 {% if user.profile.is_admin %}
                 <a href="{% url 'project_edit' p.pk %}" class="btn btn-secondary" style="padding:6px 12px;font-size:12px;">Edit</a>
@@ -50,7 +49,7 @@
             </td>
         </tr>
         {% empty %}
-        <tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:30px;">No projects yet</td></tr>
+        <tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:30px;">No projects found</td></tr>
         {% endfor %}
     </tbody>
 </table>

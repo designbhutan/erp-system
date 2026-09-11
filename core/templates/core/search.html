@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Search{% endblock %}
+{% block page_title %}Search{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Search</h1>
+    {% if q %}<p>{{ results_count }} result{{ results_count|pluralize }} for "<strong>{{ q }}</strong>"</p>
+    {% else %}<p>Search across projects, materials, vehicles, employees, and suppliers.</p>{% endif %}
+</div>
+
+{% if not q %}
+<div style="background:white;padding:40px;border-radius:12px;text-align:center;color:#94a3b8;">
+    Type at least 2 characters in the search bar above.
+</div>
+{% elif results_count == 0 %}
+<div style="background:white;padding:40px;border-radius:12px;text-align:center;color:#94a3b8;">
+    No results found for "{{ q }}"
+</div>
+{% else %}
+
+{% if projects %}
+<h3 style="font-size:15px;color:#334155;margin-bottom:12px;font-weight:600;">🏗️ Projects</h3>
+<table class="data-table" style="margin-bottom:24px;">
+    <thead><tr><th>Code</th><th>Name</th><th>Status</th></tr></thead>
+    <tbody>
+        {% for p in projects %}
+        <tr><td>{{ p.code }}</td><td>{{ p.name }}</td><td>{{ p.get_status_display }}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if materials %}
+<h3 style="font-size:15px;color:#334155;margin-bottom:12px;font-weight:600;">📦 Materials</h3>
+<table class="data-table" style="margin-bottom:24px;">
+    <thead><tr><th>Code</th><th>Name</th><th>Stock</th></tr></thead>
+    <tbody>
+        {% for m in materials %}
+        <tr><td>{{ m.code }}</td><td>{{ m.name }}</td><td>{{ m.stock_quantity }} {{ m.unit }}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if vehicles %}
+<h3 style="font-size:15px;color:#334155;margin-bottom:12px;font-weight:600;">🚙 Vehicles</h3>
+<table class="data-table" style="margin-bottom:24px;">
+    <thead><tr><th>Plate</th><th>Type</th><th>Status</th></tr></thead>
+    <tbody>
+        {% for v in vehicles %}
+        <tr><td>{{ v.plate_number }}</td><td>{{ v.get_vehicle_type_display }}</td><td>{{ v.get_status_display }}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if employees %}
+<h3 style="font-size:15px;color:#334155;margin-bottom:12px;font-weight:600;">👥 Employees</h3>
+<table class="data-table" style="margin-bottom:24px;">
+    <thead><tr><th>ID</th><th>Name</th><th>Position</th></tr></thead>
+    <tbody>
+        {% for e in employees %}
+        <tr><td>{{ e.employee_id }}</td><td>{{ e.full_name }}</td><td>{{ e.position }}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if suppliers %}
+<h3 style="font-size:15px;color:#334155;margin-bottom:12px;font-weight:600;">🛒 Suppliers</h3>
+<table class="data-table">
+    <thead><tr><th>Name</th><th>Contact</th><th>Phone</th></tr></thead>
+    <tbody>
+        {% for s in suppliers %}
+        <tr><td>{{ s.name }}</td><td>{{ s.contact_person }}</td><td>{{ s.phone }}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% endif %}
+{% endblock %}
