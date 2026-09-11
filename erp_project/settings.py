@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'materials',
     'vehicles',
     'approvals',
+    'procurement',
 ]
 
 MIDDLEWARE = [

@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import (
     Department, Employee, Vehicle, VehicleBooking,
-    Project, Material, Supplier, PurchaseOrder
+    Project, Material, Supplier
 )
 
 
@@ -18,7 +18,6 @@ def dashboard(request):
         'project_active': Project.objects.filter(status='active').count(),
         'material_count': Material.objects.count(),
         'supplier_count': Supplier.objects.count(),
-        'po_count': PurchaseOrder.objects.count(),
         'recent_projects': Project.objects.all()[:5],
         'recent_bookings': VehicleBooking.objects.all()[:5],
     }

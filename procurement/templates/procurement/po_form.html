@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}New Purchase Order{% endblock %}
+{% block page_title %}New Purchase Order{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Create Purchase Order</h1>
+    <p>Fill in supplier, project, and add material lines.</p>
+</div>
+
+<form method="post" style="max-width:1000px;">
+    {% csrf_token %}
+
+    <div style="background:white;padding:24px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:20px;">
+        <h3 style="font-size:15px;margin-bottom:16px;color:#334155;font-weight:600;">Order Details</h3>
+        {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors.0 }}</div>{% endif %}
+        {% for field in form %}
+        <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<small class="error-text">{{ field.errors.0 }}</small>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div style="background:white;padding:24px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:20px;">
+        <h3 style="font-size:15px;margin-bottom:16px;color:#334155;font-weight:600;">Order Lines</h3>
+        {{ formset.management_form }}
+        <table style="width:100%;border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th style="text-align:left;padding:8px;font-size:12px;color:#64748b;text-transform:uppercase;">Material</th>
+                    <th style="text-align:left;padding:8px;font-size:12px;color:#64748b;text-transform:uppercase;width:120px;">Quantity</th>
+                    <th style="text-align:left;padding:8px;font-size:12px;color:#64748b;text-transform:uppercase;width:140px;">Unit Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in formset %}
+                <tr>
+                    <td style="padding:8px;">{{ form.material }}</td>
+                    <td style="padding:8px;">{{ form.quantity }}</td>
+                    <td style="padding:8px;">{{ form.unit_price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+        <button type="submit" class="btn btn-primary">Create PO</button>
+        <a href="{% url 'po_list' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+{% endblock %}

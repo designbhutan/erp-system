@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Procurement{% endblock %}
+{% block page_title %}Purchase Orders{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Purchase Orders</h1>
+    <p>{{ pos|length }} purchase order{{ pos|length|pluralize }}</p>
+</div>
+
+<div style="margin-bottom:20px;">
+    <a href="{% url 'po_create' %}" class="btn btn-primary">+ New Purchase Order</a>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr><th>PO #</th><th>Supplier</th><th>Project</th><th>Date</th><th>Total</th><th>Status</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+        {% for po in pos %}
+        <tr>
+            <td><strong>{{ po.po_number }}</strong></td>
+            <td>{{ po.supplier.name }}</td>
+            <td>{% if po.project %}{{ po.project.code }}{% else %}—{% endif %}</td>
+            <td>{{ po.order_date|date:"d M Y" }}</td>
+            <td><strong>{{ po.total_amount|floatformat:2 }}</strong></td>
+            <td>
+                {% if po.status == 'draft' %}<span style="background:#e2e8f0;color:#475569;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Draft</span>
+                {% elif po.status == 'submitted' %}<span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Submitted</span>
+                {% elif po.status == 'approved' %}<span style="background:#dbeafe;color:#1e40af;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Approved</span>
+                {% elif po.status == 'received' %}<span style="background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Received</span>
+                {% else %}<span style="background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Cancelled</span>{% endif %}
+            </td>
+            <td><a href="{% url 'po_detail' po.pk %}" class="btn btn-secondary" style="padding:6px 12px;font-size:12px;">View</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:30px;">No purchase orders yet</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
 
 
 class Department(models.Model):
@@ -15,7 +14,6 @@ class Department(models.Model):
 
 
 class Employee(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     employee_id = models.CharField(max_length=20, unique=True)
     full_name = models.CharField(max_length=150)
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
@@ -73,7 +71,6 @@ class VehicleBooking(models.Model):
     ]
 
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='bookings')
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='bookings')
     project_name = models.CharField(max_length=200)
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
@@ -82,7 +79,7 @@ class VehicleBooking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.vehicle.plate_number} - {self.project_name} ({self.start_datetime:%Y-%m-%d})"
+        return f"{self.vehicle.plate_number} - {self.project_name}"
 
     class Meta:
         ordering = ['-start_datetime']
@@ -144,42 +141,3 @@ class Supplier(models.Model):
 
     class Meta:
         ordering = ['name']
-
-
-class PurchaseOrder(models.Model):
-    STATUS_CHOICES = [
-        ('draft', 'Draft'),
-        ('submitted', 'Submitted'),
-        ('approved', 'Approved'),
-        ('received', 'Received'),
-        ('cancelled', 'Cancelled'),
-    ]
-
-    po_number = models.CharField(max_length=50, unique=True)
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name='purchase_orders')
-    project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True, related_name='purchase_orders')
-    order_date = models.DateField()
-    expected_delivery = models.DateField(null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
-    notes = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.po_number
-
-    class Meta:
-        ordering = ['-order_date']
-
-
-class PurchaseOrderLine(models.Model):
-    purchase_order = models.ForeignKey(PurchaseOrder, on_delete=models.CASCADE, related_name='lines')
-    material = models.ForeignKey(Material, on_delete=models.CASCADE)
-    quantity = models.DecimalField(max_digits=12, decimal_places=2)
-    unit_price = models.DecimalField(max_digits=12, decimal_places=2)
-
-    def __str__(self):
-        return f"{self.purchase_order.po_number} - {self.material.name}"
-
-    @property
-    def line_total(self):
-        return self.quantity * self.unit_price

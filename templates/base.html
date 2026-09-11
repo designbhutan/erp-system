@@ -118,9 +118,9 @@
             <li><a href="{% url 'leave_pending' %}" class="{% if request.resolver_match.url_name == 'leave_pending' %}active{% endif %}"><span class="icon">✅</span> Approve Leave</a></li>
             <li><a href="{% url 'materials_pending' %}" class="{% if request.resolver_match.url_name == 'materials_pending' %}active{% endif %}"><span class="icon">✅</span> Approve Materials</a></li>
             <li><a href="{% url 'vehicles_pending' %}" class="{% if request.resolver_match.url_name == 'vehicles_pending' %}active{% endif %}"><span class="icon">✅</span> Approve Bookings</a></li>
+            <li><a href="{% url 'po_list' %}" class="{% if 'po_' in request.resolver_match.url_name %}active{% endif %}"><span class="icon">🛒</span> Procurement</a></li>
             <li><a href="#"><span class="icon">👥</span> Employees</a></li>
             <li><a href="#"><span class="icon">🏗️</span> Projects</a></li>
-            <li><a href="#"><span class="icon">🛒</span> Procurement</a></li>
             <li><a href="/admin/" target="_blank"><span class="icon">⚙️</span> Django Admin</a></li>
         </ul>
         {% endif %}

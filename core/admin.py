@@ -1,8 +1,5 @@
 from django.contrib import admin
-from .models import (
-    Department, Employee, Vehicle, VehicleBooking,
-    Project, Material, Supplier, PurchaseOrder, PurchaseOrderLine
-)
+from .models import Department, Employee, Vehicle, VehicleBooking, Project, Material, Supplier
 
 
 @admin.register(Department)
@@ -27,7 +24,7 @@ class VehicleAdmin(admin.ModelAdmin):
 
 @admin.register(VehicleBooking)
 class VehicleBookingAdmin(admin.ModelAdmin):
-    list_display = ('vehicle', 'employee', 'project_name', 'start_datetime', 'end_datetime', 'status')
+    list_display = ('vehicle', 'project_name', 'start_datetime', 'end_datetime', 'status')
     list_filter = ('status', 'vehicle')
     search_fields = ('project_name',)
 
@@ -49,16 +46,3 @@ class MaterialAdmin(admin.ModelAdmin):
 class SupplierAdmin(admin.ModelAdmin):
     list_display = ('name', 'contact_person', 'email', 'phone')
     search_fields = ('name',)
-
-
-class PurchaseOrderLineInline(admin.TabularInline):
-    model = PurchaseOrderLine
-    extra = 1
-
-
-@admin.register(PurchaseOrder)
-class PurchaseOrderAdmin(admin.ModelAdmin):
-    list_display = ('po_number', 'supplier', 'project', 'order_date', 'status')
-    list_filter = ('status',)
-    search_fields = ('po_number',)
-    inlines = [PurchaseOrderLineInline]
