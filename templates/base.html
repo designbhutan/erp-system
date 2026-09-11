@@ -96,6 +96,8 @@
         <div class="sidebar-section">Main</div>
         <ul class="sidebar-menu">
             <li><a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><span class="icon">📊</span> Dashboard</a></li>
+            <li><a href="{% url 'reports_company' %}" class="{% if request.resolver_match.url_name == 'reports_company' %}active{% endif %}"><span class="icon">📊</span> Company Reports</a></li>
+            <li><a href="{% url 'reports_my' %}" class="{% if request.resolver_match.url_name == 'reports_my' %}active{% endif %}"><span class="icon">📈</span> My Reports</a></li>
         </ul>
 
         <div class="sidebar-section">My Requests</div>

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}My Reports{% endblock %}
+{% block page_title %}My Reports{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>My Reports</h1>
+    <p>Your personal activity summary.</p>
+</div>
+
+<h3 style="font-size:15px;color:#334155;margin-bottom:14px;font-weight:600;">🌴 My Leave</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:30px;">
+    <div class="card green"><h2>{{ my_leave_stats.approved }}</h2><p>Days Approved</p></div>
+    <div class="card orange"><h2>{{ my_leave_stats.pending }}</h2><p>Days Pending</p></div>
+    <div class="card red"><h2>{{ my_leave_stats.rejected_count }}</h2><p>Rejected</p></div>
+</div>
+
+<h3 style="font-size:15px;color:#334155;margin-bottom:14px;font-weight:600;">📦 My Material Requests</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:30px;">
+    <div class="card"><h2>{{ my_mr_stats.total }}</h2><p>Total</p></div>
+    <div class="card green"><h2>{{ my_mr_stats.approved }}</h2><p>Approved</p></div>
+    <div class="card orange"><h2>{{ my_mr_stats.pending }}</h2><p>Pending</p></div>
+    <div class="card red"><h2>{{ my_mr_stats.rejected }}</h2><p>Rejected</p></div>
+</div>
+
+<h3 style="font-size:15px;color:#334155;margin-bottom:14px;font-weight:600;">🚗 My Vehicle Bookings</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:30px;">
+    <div class="card"><h2>{{ my_booking_stats.total }}</h2><p>Total</p></div>
+    <div class="card green"><h2>{{ my_booking_stats.approved }}</h2><p>Approved</p></div>
+    <div class="card orange"><h2>{{ my_booking_stats.pending }}</h2><p>Pending</p></div>
+    <div class="card purple"><h2>{{ my_booking_stats.completed }}</h2><p>Completed</p></div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+    <div>
+        <h3 style="font-size:15px;color:#334155;margin-bottom:12px;font-weight:600;">Recent Leave</h3>
+        <table class="data-table">
+            <thead><tr><th>From</th><th>Days</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for r in recent_leaves %}
+                <tr><td>{{ r.start_date|date:"d M Y" }}</td><td>{{ r.days_requested }}</td><td>{{ r.get_status_display }}</td></tr>
+                {% empty %}
+                <tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:20px;">None</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <h3 style="font-size:15px;color:#334155;margin-bottom:12px;font-weight:600;">Recent Material Requests</h3>
+        <table class="data-table">
+            <thead><tr><th>ID</th><th>Items</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for r in recent_mrs %}
+                <tr><td>MR#{{ r.pk }}</td><td>{{ r.total_items }}</td><td>{{ r.get_status_display }}</td></tr>
+                {% empty %}
+                <tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:20px;">None</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <h3 style="font-size:15px;color:#334155;margin-bottom:12px;font-weight:600;">Recent Bookings</h3>
+        <table class="data-table">
+            <thead><tr><th>Vehicle</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for b in recent_bookings %}
+                <tr><td>{{ b.vehicle.plate_number }}</td><td>{{ b.start_datetime|date:"d M Y" }}</td><td>{{ b.get_status_display }}</td></tr>
+                {% empty %}
+                <tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:20px;">None</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,1 @@
+# Reports app has no models — it's a dashboard aggregator only.
