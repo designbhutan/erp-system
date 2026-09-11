@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>My Profile</h1>
+    <p>Manage your account information.</p>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 2fr;gap:20px;">
+    <div style="background:white;padding:30px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);text-align:center;">
+        <div style="width:80px;height:80px;border-radius:50%;background:{% if user.profile.is_admin %}#dc2626{% else %}#3b82f6{% endif %};color:white;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;margin:0 auto 16px;">
+            {{ user.first_name|first|default:user.username|first|upper }}
+        </div>
+        <h2 style="font-size:20px;color:#0f172a;">{{ user.first_name }} {{ user.last_name }}</h2>
+        <p style="color:#64748b;margin-top:4px;">@{{ user.username }}</p>
+        <div style="margin-top:12px;">
+            {% if user.profile.is_admin %}
+            <span style="background:#dc2626;color:white;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;">Admin / Supervisor</span>
+            {% else %}
+            <span style="background:#3b82f6;color:white;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;">Employee</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div style="background:white;padding:30px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+        <h3 style="font-size:16px;color:#334155;margin-bottom:20px;font-weight:600;">Account Details</h3>
+        <div style="display:grid;grid-template-columns:140px 1fr;gap:14px;font-size:14px;line-height:1.8;">
+            <div style="color:#94a3b8;">Username</div><div><strong>{{ user.username }}</strong></div>
+            <div style="color:#94a3b8;">Email</div><div>{{ user.email|default:"—" }}</div>
+            <div style="color:#94a3b8;">Phone</div><div>{{ user.profile.phone|default:"—" }}</div>
+            <div style="color:#94a3b8;">Department</div><div>{{ user.profile.department.name|default:"—" }}</div>
+            <div style="color:#94a3b8;">Member Since</div><div>{{ user.date_joined|date:"d M Y" }}</div>
+        </div>
+        <div style="margin-top:24px;display:flex;gap:10px;">
+            <a href="{% url 'profile_edit' %}" class="btn btn-primary">Edit Profile</a>
+            <a href="{% url 'password_change' %}" class="btn btn-secondary">Change Password</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

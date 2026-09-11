@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Project{% endblock %}
+{% block page_title %}{{ action }} Project{% endblock %}
+
+{% block content %}
+<div class="page-header"><h1>{{ action }} Project</h1></div>
+
+<form method="post" style="max-width:800px;background:white;padding:30px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+    {% csrf_token %}
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:16px;">
+        <div class="form-group">
+            <label>Code *</label>
+            <input type="text" name="code" class="form-control" value="{{ project.code|default:'' }}" required placeholder="PRJ-001">
+        </div>
+        <div class="form-group">
+            <label>Name *</label>
+            <input type="text" name="name" class="form-control" value="{{ project.name|default:'' }}" required>
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" class="form-control" rows="3">{{ project.description|default:'' }}</textarea>
+    </div>
+    <div class="form-group">
+        <label>Manager</label>
+        <select name="manager" class="form-control">
+            <option value="">— None —</option>
+            {% for m in managers %}
+            <option value="{{ m.pk }}" {% if project.manager_id == m.pk %}selected{% endif %}>{{ m.full_name }} ({{ m.employee_id }})</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="form-group">
+            <label>Start Date *</label>
+            <input type="date" name="start_date" class="form-control" value="{{ project.start_date|date:'Y-m-d'|default:'' }}" required>
+        </div>
+        <div class="form-group">
+            <label>End Date</label>
+            <input type="date" name="end_date" class="form-control" value="{{ project.end_date|date:'Y-m-d'|default:'' }}">
+        </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="form-group">
+            <label>Budget</label>
+            <input type="number" step="0.01" min="0" name="budget" class="form-control" value="{{ project.budget|default:0 }}">
+        </div>
+        <div class="form-group">
+            <label>Progress (%)</label>
+            <input type="number" min="0" max="100" name="progress_percent" class="form-control" value="{{ project.progress_percent|default:0 }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Status</label>
+        <select name="status" class="form-control">
+            {% for value, label in statuses %}
+            <option value="{{ value }}" {% if project.status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div style="margin-top:24px;display:flex;gap:10px;">
+        <button type="submit" class="btn btn-primary">{{ action }} Project</button>
+        <a href="{% url 'project_list' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+{% endblock %}

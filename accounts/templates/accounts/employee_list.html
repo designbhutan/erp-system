@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Employees{% endblock %}
+{% block page_title %}Employees{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Employees</h1>
+    <p>{{ employees|length }} employee{{ employees|length|pluralize }} in the company.</p>
+</div>
+
+<div style="margin-bottom:20px;display:flex;gap:10px;">
+    <a href="{% url 'employees_create' %}" class="btn btn-primary">+ Add Employee</a>
+    <a href="{% url 'users_list' %}" class="btn btn-secondary">Manage Users &amp; Roles</a>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr><th>ID</th><th>Name</th><th>Department</th><th>Position</th><th>Email</th><th>Status</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+        {% for e in employees %}
+        <tr>
+            <td><strong>{{ e.employee_id }}</strong></td>
+            <td>{{ e.full_name }}</td>
+            <td>{{ e.department.name|default:"—" }}</td>
+            <td>{{ e.position }}</td>
+            <td>{{ e.email|default:"—" }}</td>
+            <td>
+                {% if e.is_active %}<span style="background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Active</span>
+                {% else %}<span style="background:#e2e8f0;color:#475569;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Inactive</span>{% endif %}
+            </td>
+            <td>
+                <a href="{% url 'employees_edit' e.pk %}" class="btn btn-secondary" style="padding:6px 12px;font-size:12px;">Edit</a>
+                <a href="{% url 'employees_delete' e.pk %}" class="btn btn-danger" style="padding:6px 12px;font-size:12px;">Delete</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:30px;">No employees yet</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Delete Project{% endblock %}
+{% block page_title %}Delete Project{% endblock %}
+
+{% block content %}
+<div style="max-width:500px;background:white;padding:30px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+    <h2 style="color:#dc2626;margin-bottom:12px;">Delete Project?</h2>
+    <p style="color:#475569;margin-bottom:24px;">
+        Are you sure you want to delete <strong>{{ project.name }}</strong> ({{ project.code }})? This cannot be undone.
+    </p>
+    <form method="post" style="display:flex;gap:10px;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'project_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

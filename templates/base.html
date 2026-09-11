@@ -111,6 +111,7 @@
         <ul class="sidebar-menu">
             <li><a href="{% url 'materials_list' %}" class="{% if request.resolver_match.url_name == 'materials_list' %}active{% endif %}"><span class="icon">📋</span> Materials List</a></li>
             <li><a href="{% url 'vehicles_list' %}" class="{% if request.resolver_match.url_name == 'vehicles_list' %}active{% endif %}"><span class="icon">🚙</span> Fleet Vehicles</a></li>
+            <li><a href="{% url 'project_list' %}" class="{% if 'project' in request.resolver_match.url_name %}active{% endif %}"><span class="icon">🏗️</span> Projects</a></li>
         </ul>
 
         {% if user.profile.is_admin %}
@@ -121,15 +122,14 @@
             <li><a href="{% url 'materials_pending' %}" class="{% if request.resolver_match.url_name == 'materials_pending' %}active{% endif %}"><span class="icon">✅</span> Approve Materials</a></li>
             <li><a href="{% url 'vehicles_pending' %}" class="{% if request.resolver_match.url_name == 'vehicles_pending' %}active{% endif %}"><span class="icon">✅</span> Approve Bookings</a></li>
             <li><a href="{% url 'po_list' %}" class="{% if 'po_' in request.resolver_match.url_name %}active{% endif %}"><span class="icon">🛒</span> Procurement</a></li>
-            <li><a href="#"><span class="icon">👥</span> Employees</a></li>
-            <li><a href="#"><span class="icon">🏗️</span> Projects</a></li>
+            <li><a href="{% url 'employees_list' %}" class="{% if 'employees' in request.resolver_match.url_name or request.resolver_match.url_name == 'users_list' %}active{% endif %}"><span class="icon">👥</span> Employees</a></li>
             <li><a href="/admin/" target="_blank"><span class="icon">⚙️</span> Django Admin</a></li>
         </ul>
         {% endif %}
 
         <div class="sidebar-section">Account</div>
         <ul class="sidebar-menu">
-            <li><a href="#"><span class="icon">👤</span> My Profile</a></li>
+            <li><a href="{% url 'profile_view' %}" class="{% if 'profile' in request.resolver_match.url_name or request.resolver_match.url_name == 'password_change' %}active{% endif %}"><span class="icon">👤</span> My Profile</a></li>
             <li><a href="{% url 'logout' %}"><span class="icon">🚪</span> Logout</a></li>
         </ul>
     </aside>

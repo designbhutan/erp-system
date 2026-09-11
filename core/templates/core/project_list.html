@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Projects{% endblock %}
+{% block page_title %}Projects{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Projects</h1>
+    <p>{{ projects|length }} project{{ projects|length|pluralize }} in the system.</p>
+</div>
+
+{% if user.profile.is_admin %}
+<div style="margin-bottom:20px;">
+    <a href="{% url 'project_create' %}" class="btn btn-primary">+ New Project</a>
+</div>
+{% endif %}
+
+<table class="data-table">
+    <thead>
+        <tr><th>Code</th><th>Name</th><th>Manager</th><th>Start</th><th>End</th><th>Budget</th><th>Progress</th><th>Status</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+        {% for p in projects %}
+        <tr>
+            <td><strong>{{ p.code }}</strong></td>
+            <td>{{ p.name }}</td>
+            <td>{{ p.manager.full_name|default:"—" }}</td>
+            <td>{{ p.start_date|date:"d M Y" }}</td>
+            <td>{{ p.end_date|date:"d M Y"|default:"—" }}</td>
+            <td>{{ p.budget|floatformat:2 }}</td>
+            <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="flex:1;background:#e2e8f0;border-radius:10px;height:8px;min-width:60px;overflow:hidden;">
+                        <div style="width:{{ p.progress_percent }}%;background:#3b82f6;height:100%;"></div>
+                    </div>
+                    <span style="font-size:12px;color:#64748b;">{{ p.progress_percent }}%</span>
+                </div>
+            </td>
+            <td>
+                {% if p.status == 'planning' %}<span style="background:#e2e8f0;color:#475569;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Planning</span>
+                {% elif p.status == 'active' %}<span style="background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Active</span>
+                {% elif p.status == 'on_hold' %}<span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">On Hold</span>
+                {% elif p.status == 'completed' %}<span style="background:#dbeafe;color:#1e40af;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Completed</span>
+                {% else %}<span style="background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Cancelled</span>{% endif %}
+            </td>
+            <td>
+                {% if user.profile.is_admin %}
+                <a href="{% url 'project_edit' p.pk %}" class="btn btn-secondary" style="padding:6px 12px;font-size:12px;">Edit</a>
+                <a href="{% url 'project_delete' p.pk %}" class="btn btn-danger" style="padding:6px 12px;font-size:12px;">Delete</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:30px;">No projects yet</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

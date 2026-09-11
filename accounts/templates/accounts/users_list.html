@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Users & Roles{% endblock %}
+{% block page_title %}Users &amp; Roles{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Users &amp; Roles</h1>
+    <p>{{ users|length }} account{{ users|length|pluralize }} registered.</p>
+</div>
+
+<div style="margin-bottom:20px;">
+    <a href="{% url 'employees_list' %}" class="btn btn-secondary">← Back to Employees</a>
+</div>
+
+<table class="data-table">
+    <thead><tr><th>Username</th><th>Full Name</th><th>Email</th><th>Role</th><th>Action</th></tr></thead>
+    <tbody>
+        {% for u in users %}
+        <tr>
+            <td><strong>{{ u.username }}</strong></td>
+            <td>{{ u.first_name }} {{ u.last_name }}</td>
+            <td>{{ u.email|default:"—" }}</td>
+            <td>
+                {% if u.is_superuser %}<span style="background:#7c3aed;color:white;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Superuser</span>
+                {% elif u.profile.is_admin %}<span style="background:#dc2626;color:white;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Admin</span>
+                {% else %}<span style="background:#3b82f6;color:white;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;">Employee</span>{% endif %}
+            </td>
+            <td>
+                {% if not u.is_superuser and u.pk != request.user.pk %}
+                    {% if u.profile.is_admin %}
+                    <a href="{% url 'users_toggle' u.pk %}" class="btn btn-secondary" style="padding:6px 12px;font-size:12px;" onclick="return confirm('Demote to Employee?');">Demote</a>
+                    {% else %}
+                    <a href="{% url 'users_toggle' u.pk %}" class="btn btn-success" style="padding:6px 12px;font-size:12px;" onclick="return confirm('Promote to Admin?');">Promote</a>
+                    {% endif %}
+                {% else %}
+                <span style="color:#94a3b8;font-size:12px;">—</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
