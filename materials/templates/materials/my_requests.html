@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}My Material Requests{% endblock %}
+{% block page_title %}My Material Requests{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>My Material Requests</h1>
+    <p>All your submitted requests and their status.</p>
+</div>
+
+<div style="margin-bottom:20px;display:flex;gap:10px;">
+    <a href="{% url 'materials_request' %}" class="btn btn-primary">+ New Request</a>
+    <a href="{% url 'materials_list' %}" class="btn btn-secondary">Inventory</a>
+</div>
+
+{% for r in requests %}
+<div style="background:white;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div>
+            <strong style="font-size:15px;">MR#{{ r.pk }}</strong>
+            {% if r.project_name %}<span style="color:#64748b;margin-left:10px;">{{ r.project_name }}</span>{% endif %}
+        </div>
+        <div>
+            {% if r.status == 'pending' %}<span style="background:#fef3c7;color:#92400e;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;">Pending</span>
+            {% elif r.status == 'approved' %}<span style="background:#d1fae5;color:#065f46;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;">Approved</span>
+            {% elif r.status == 'rejected' %}<span style="background:#fee2e2;color:#991b1b;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;">Rejected</span>
+            {% else %}<span style="background:#e2e8f0;color:#475569;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;">Cancelled</span>{% endif %}
+        </div>
+    </div>
+
+    <table style="width:100%;border-collapse:collapse;margin-top:10px;">
+        <thead>
+            <tr style="border-bottom:1px solid #f1f5f9;">
+                <th style="text-align:left;padding:8px 0;font-size:12px;color:#64748b;">Material</th>
+                <th style="text-align:left;padding:8px 0;font-size:12px;color:#64748b;">Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for line in r.lines.all %}
+            <tr style="border-bottom:1px solid #f8fafc;">
+                <td style="padding:8px 0;font-size:14px;">{{ line.material.name }} <span style="color:#94a3b8;">({{ line.material.code }})</span></td>
+                <td style="padding:8px 0;font-size:14px;">{{ line.quantity }} {{ line.material.unit }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="color:#94a3b8;font-size:12px;">Submitted {{ r.created_at|date:"d M Y, H:i" }}</span>
+        {% if r.status == 'pending' %}
+        <a href="{% url 'materials_cancel' r.pk %}" class="btn btn-secondary" style="padding:6px 14px;font-size:12px;" onclick="return confirm('Cancel this request?');">Cancel</a>
+        {% endif %}
+    </div>
+
+    {% if r.admin_comment %}
+    <div style="margin-top:12px;padding:10px;background:#f8fafc;border-radius:8px;font-size:13px;color:#475569;">
+        <strong>Admin comment:</strong> {{ r.admin_comment }}
+    </div>
+    {% endif %}
+</div>
+{% empty %}
+<div style="background:white;padding:40px;border-radius:12px;text-align:center;color:#94a3b8;">
+    No requests yet. <a href="{% url 'materials_request' %}" style="color:#3b82f6;font-weight:600;">Create your first one</a>.
+</div>
+{% endfor %}
+{% endblock %}

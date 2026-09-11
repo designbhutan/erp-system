@@ -102,16 +102,22 @@
         <ul class="sidebar-menu">
             <li><a href="{% url 'leave_home' %}" class="{% if 'leave' in request.resolver_match.url_name %}active{% endif %}"><span class="icon">🌴</span> Leave</a></li>
             <li><a href="#"><span class="icon">🚗</span> Vehicle Booking</a></li>
-            <li><a href="#"><span class="icon">📦</span> Material Request</a></li>
+            <li><a href="{% url 'materials_my_requests' %}" class="{% if request.resolver_match.url_name == 'materials_my_requests' %}active{% endif %}"><span class="icon">📦</span> My Material Requests</a></li>
+        </ul>
+
+        <div class="sidebar-section">Inventory</div>
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'materials_list' %}" class="{% if request.resolver_match.url_name == 'materials_list' %}active{% endif %}"><span class="icon">📋</span> Materials List</a></li>
+            <li><a href="{% url 'materials_request' %}" class="{% if request.resolver_match.url_name == 'materials_request' %}active{% endif %}"><span class="icon">➕</span> New Request</a></li>
         </ul>
 
         {% if user.profile.is_admin %}
         <div class="sidebar-section">Administration</div>
         <ul class="sidebar-menu">
             <li><a href="{% url 'leave_pending' %}" class="{% if request.resolver_match.url_name == 'leave_pending' %}active{% endif %}"><span class="icon">✅</span> Approve Leave</a></li>
+            <li><a href="{% url 'materials_pending' %}" class="{% if request.resolver_match.url_name == 'materials_pending' %}active{% endif %}"><span class="icon">✅</span> Approve Materials</a></li>
             <li><a href="#"><span class="icon">👥</span> Employees</a></li>
             <li><a href="#"><span class="icon">🚙</span> Fleet</a></li>
-            <li><a href="#"><span class="icon">📦</span> Inventory</a></li>
             <li><a href="#"><span class="icon">🏗️</span> Projects</a></li>
             <li><a href="#"><span class="icon">🛒</span> Procurement</a></li>
             <li><a href="/admin/" target="_blank"><span class="icon">⚙️</span> Django Admin</a></li>

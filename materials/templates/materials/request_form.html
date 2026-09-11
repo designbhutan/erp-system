@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}New Material Request{% endblock %}
+{% block page_title %}New Material Request{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>New Material Request</h1>
+    <p>Select the materials you need. Admin will review and approve.</p>
+</div>
+
+<form method="post" style="max-width:900px;">
+    {% csrf_token %}
+
+    <div style="background:white;padding:24px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:20px;">
+        <h3 style="font-size:15px;margin-bottom:16px;color:#334155;font-weight:600;">Request Details</h3>
+        {% for field in main_form %}
+        <div class="form-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<small class="error-text">{{ field.errors.0 }}</small>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div style="background:white;padding:24px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:20px;">
+        <h3 style="font-size:15px;margin-bottom:16px;color:#334155;font-weight:600;">Materials</h3>
+        {{ line_formset.management_form }}
+        <table style="width:100%;border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th style="text-align:left;padding:8px;font-size:12px;color:#64748b;text-transform:uppercase;">Material</th>
+                    <th style="text-align:left;padding:8px;font-size:12px;color:#64748b;text-transform:uppercase;width:140px;">Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in line_formset %}
+                <tr>
+                    <td style="padding:8px;">{{ form.material }}</td>
+                    <td style="padding:8px;">{{ form.quantity }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+        <button type="submit" class="btn btn-primary">Submit Request</button>
+        <a href="{% url 'materials_list' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+{% endblock %}

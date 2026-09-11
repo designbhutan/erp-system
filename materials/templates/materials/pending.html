@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Pending Material Requests{% endblock %}
+{% block page_title %}Pending Material Requests{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Pending Material Requests</h1>
+    <p>{{ pending|length }} request{{ pending|length|pluralize }} awaiting review.</p>
+</div>
+
+{% for r in pending %}
+<div style="background:white;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div>
+            <strong style="font-size:15px;">MR#{{ r.pk }}</strong>
+            <span style="color:#64748b;margin-left:10px;">by <strong>{{ r.user.first_name|default:r.user.username }}</strong></span>
+            {% if r.project_name %}<span style="color:#64748b;margin-left:10px;">· {{ r.project_name }}</span>{% endif %}
+        </div>
+        <span style="color:#94a3b8;font-size:12px;">{{ r.created_at|date:"d M Y, H:i" }}</span>
+    </div>
+
+    {% if r.purpose %}
+    <div style="padding:10px 12px;background:#f8fafc;border-radius:8px;font-size:13px;color:#475569;margin-bottom:12px;">
+        <strong>Purpose:</strong> {{ r.purpose }}
+    </div>
+    {% endif %}
+
+    <table class="data-table" style="margin-bottom:12px;">
+        <thead>
+            <tr><th>Material</th><th>Requested</th><th>Available Stock</th></tr>
+        </thead>
+        <tbody>
+            {% for line in r.lines.all %}
+            <tr>
+                <td>{{ line.material.name }} <span style="color:#94a3b8;">({{ line.material.code }})</span></td>
+                <td>{{ line.quantity }} {{ line.material.unit }}</td>
+                <td>
+                    {% if line.material.stock_quantity < line.quantity %}
+                    <span style="color:#dc2626;font-weight:700;">{{ line.material.stock_quantity }} {{ line.material.unit }} ⚠</span>
+                    {% else %}
+                    {{ line.material.stock_quantity }} {{ line.material.unit }}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="display:flex;gap:10px;">
+        <a href="{% url 'materials_review' r.pk 'approve' %}" class="btn btn-success" onclick="return confirm('Approve this request? Stock will be deducted (may go negative).');">Approve</a>
+        <a href="{% url 'materials_review' r.pk 'reject' %}" class="btn btn-danger" onclick="return confirm('Reject this request?');">Reject</a>
+    </div>
+</div>
+{% empty %}
+<div style="background:white;padding:40px;border-radius:12px;text-align:center;color:#94a3b8;">
+    No pending requests 🎉
+</div>
+{% endfor %}
+{% endblock %}

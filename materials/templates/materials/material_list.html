@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Inventory{% endblock %}
+{% block page_title %}Materials Inventory{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Materials Inventory</h1>
+    <p>{{ materials|length }} items in stock{% if low_stock_count %} · <span style="color:#dc2626;font-weight:600;">{{ low_stock_count }} low stock</span>{% endif %}</p>
+</div>
+
+<div style="margin-bottom:20px;display:flex;gap:10px;">
+    <a href="{% url 'materials_request' %}" class="btn btn-primary">+ New Material Request</a>
+    <a href="{% url 'materials_my_requests' %}" class="btn btn-secondary">My Requests</a>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr><th>Code</th><th>Name</th><th>Unit</th><th>Unit Price</th><th>Stock</th><th>Reorder Level</th></tr>
+    </thead>
+    <tbody>
+        {% for m in materials %}
+        <tr>
+            <td><strong>{{ m.code }}</strong></td>
+            <td>{{ m.name }}</td>
+            <td>{{ m.unit }}</td>
+            <td>{{ m.unit_price }}</td>
+            <td>
+                {% if m.stock_quantity <= m.reorder_level %}
+                <span style="color:#dc2626;font-weight:700;">{{ m.stock_quantity }}</span>
+                {% else %}
+                {{ m.stock_quantity }}
+                {% endif %}
+            </td>
+            <td style="color:#64748b;">{{ m.reorder_level }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:30px;">No materials in inventory. Add some via Django Admin.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
