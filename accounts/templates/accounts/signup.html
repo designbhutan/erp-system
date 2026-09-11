@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Sign Up - ERP System{% endblock %}
+
+{% block auth_content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <h1>Create Account</h1>
+        <p class="subtitle">Join the ERP System</p>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <small class="error-text">{{ field.errors.0 }}</small>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+        </form>
+        <p class="auth-footer">Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+    </div>
+</div>
+{% endblock %}

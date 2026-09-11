@@ -1,10 +1,12 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from .models import (
     Department, Employee, Vehicle, VehicleBooking,
     Project, Material, Supplier, PurchaseOrder
 )
 
 
+@login_required
 def dashboard(request):
     context = {
         'department_count': Department.objects.count(),
